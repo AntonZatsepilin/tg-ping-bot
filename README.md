@@ -1,4 +1,4 @@
-# TgBotPingRobot
+# tg-ping-bot
 
 ### Launch
 
