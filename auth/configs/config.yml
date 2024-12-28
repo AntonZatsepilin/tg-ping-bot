@@ -1,0 +1,9 @@
+database:
+  username: "postgres"
+  host: "db"
+  port: "5432"
+  dbname: "todo-db"
+  sslmode: "disable"
+
+jwt:
+  secret: "your_jwt_secret"
