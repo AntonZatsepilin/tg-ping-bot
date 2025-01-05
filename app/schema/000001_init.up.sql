@@ -11,3 +11,9 @@ CREATE TABLE refresh_tokens (
     token_hash VARCHAR(255) NOT NULL,  
     expires_at TIMESTAMP NOT NULL      
 );
+
+CREATE TABLE urls (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    url VARCHAR(255) NOT NULL
+);
