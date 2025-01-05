@@ -1,15 +1,93 @@
-version: '3.8'
-
 services:
-  app:
+  jwt-service:
+    container_name: jwt-service
+    env_file: ".env"
     build:
-      context: .
+      context: ./jwt-service
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRY: ${ACCESS_TOKEN_EXPIRY}
+      REFRESH_TOKEN_EXPIRY: ${REFRESH_TOKEN_EXPIRY}
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+
+  url-ping-app:
+    container_name: url-ping-app
+    ports:
+      - "8080:8080"
+    restart: always
+    env_file: ".env"
+    depends_on:
+      jwt-service:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    command: >
+      /bin/sh -c "
+      /usr/local/bin/migrate -path /app/schema -database postgres://postgres:postgres@url-ping-db:5432/url-ping-db?sslmode=disable up &&
+      ./main
+      "
+    build:
+      context: ./app
       dockerfile: Dockerfile
     environment:
-      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
-      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
-      INTERVAL: 10
-      REQUEST_TIMEOUT: 2
-      WORKERS_COUNT: 3
+      JWT_SERVICE_URL: ${JWT_SERVICE_URL}
+    
+  database:
+    container_name: url-ping-db
+    image: postgres:latest
+    env_file: ".env"
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "8080:8080" 
+      - 5432:5432
+    volumes:
+      - ./docker/pgdata:/var/lib/postgresql/data
+    command: >
+      -c max_connections=1000
+      -c shared_buffers=4GB 
+      -c effective_cache_size=12GB 
+      -c maintenance_work_mem=1GB 
+      -c checkpoint_completion_target=0.9 
+      -c wal_buffers=16MB 
+      -c default_statistics_target=100 
+      -c random_page_cost=1.1 
+      -c work_mem=4000kB 
+      -c huge_pages=off 
+      -c min_wal_size=1GB 
+      -c max_wal_size=4GB  
+      -c max_worker_processes=4 
+      -c max_parallel_workers_per_gather=2 
+      -c max_parallel_workers=4 
+      -c max_parallel_maintenance_workers=2
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${DB_NAME} -U $${DB_USER}" ]
+      interval: 15s
+      timeout: 15s
+      retries: 50
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    depends_on:
+      - database
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+
+volumes:
+  pgadmin:

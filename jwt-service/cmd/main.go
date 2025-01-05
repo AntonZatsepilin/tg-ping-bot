@@ -48,17 +48,17 @@ func main() {
 
     listener, err := net.Listen("tcp", ":50051")
     if err != nil {
-        log.Fatalf("Failed to start gRPC server: %v", err)
+        logrus.Fatalf("Failed to start gRPC server: %v", err)
     }
 
     log.Println("Auth service is running on port 50051")
     if err := grpcServer.Serve(listener); err != nil {
-        log.Fatalf("Failed to serve gRPC server: %v", err)
+        logrus.Fatalf("Failed to serve gRPC server: %v", err)
     }
 }
 
 func initConfig() error {
-	viper.AddConfigPath("./configs")
+	viper.AddConfigPath("auth/configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
