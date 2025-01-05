@@ -1,9 +1,6 @@
-database:
+db:
   username: "postgres"
-  host: "db"
+  host: "url-ping-db"
   port: "5432"
-  dbname: "todo-db"
+  dbname: "url-ping-db"
   sslmode: "disable"
-
-jwt:
-  secret: "your_jwt_secret"

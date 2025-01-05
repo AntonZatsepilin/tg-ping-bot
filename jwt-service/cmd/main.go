@@ -58,7 +58,7 @@ func main() {
 }
 
 func initConfig() error {
-	viper.AddConfigPath("auth/configs")
+	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }

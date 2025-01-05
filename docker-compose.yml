@@ -6,7 +6,7 @@ services:
       context: ./jwt-service
       dockerfile: Dockerfile
     ports:
-      - "9000:9000"
+      - "50051:50051"
     environment:
       JWT_SECRET: ${JWT_SECRET}
       ACCESS_TOKEN_EXPIRY: ${ACCESS_TOKEN_EXPIRY}
@@ -15,6 +15,11 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:50051/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   url-ping-app:
     container_name: url-ping-app
