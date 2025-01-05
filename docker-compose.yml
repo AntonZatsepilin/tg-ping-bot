@@ -15,11 +15,6 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:50051/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   url-ping-app:
     container_name: url-ping-app
@@ -28,13 +23,11 @@ services:
     restart: always
     env_file: ".env"
     depends_on:
-      jwt-service:
-        condition: service_healthy
       database:
         condition: service_healthy
     command: >
       /bin/sh -c "
-      /usr/local/bin/migrate -path /app/schema -database postgres://postgres:postgres@url-ping-db:5432/url-ping-db?sslmode=disable up &&
+      /usr/local/bin/migrate -path /app/schema -database postgres://postgres:qwerty@url-ping-db:5432/url-ping-db?sslmode=disable up &&
       ./main
       "
     build:
