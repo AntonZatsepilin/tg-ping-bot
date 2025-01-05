@@ -4,11 +4,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"goPingRobot/auth/internal/models"
-	"goPingRobot/auth/internal/repository"
 	"strings"
 	"time"
 
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/models"
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/repository"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/argon2"
 )

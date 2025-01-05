@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"goPingRobot/auth/internal/models"
-
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 

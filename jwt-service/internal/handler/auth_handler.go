@@ -2,8 +2,9 @@ package handler
 
 import (
 	"context"
-	"goPingRobot/auth/internal/service"
-	"goPingRobot/auth/proto"
+
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/service"
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/proto"
 )
 
 type AuthHandler struct {

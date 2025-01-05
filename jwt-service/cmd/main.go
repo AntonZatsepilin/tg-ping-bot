@@ -1,14 +1,14 @@
 package main
 
 import (
-	"goPingRobot/auth/internal/handler"
-	"goPingRobot/auth/internal/repository"
-	"goPingRobot/auth/internal/service"
-	"goPingRobot/auth/proto"
 	"log"
 	"net"
 	"os"
 
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/handler"
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/repository"
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/internal/service"
+	"github.com/AntonZatsepilin/mephi-database-homework/jwt-service/proto"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
