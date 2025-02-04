@@ -1,33 +1,46 @@
 package workerpool
 
-import "github.com/AntonZatsepilin/mephi-database-homework/app/internal/service"
+import (
+	"github.com/AntonZatsepilin/mephi-database-homework/app/internal/service"
+	"github.com/sirupsen/logrus"
+)
 
-type URL_response struct {
+type url_response struct {
 	URL    string
 	Status string
 }
 
-func worker(urlChan chan string, resultChan chan URL_response) {
+func worker(id int, urlChan chan string, resultChan chan url_response) {
 	for url := range urlChan {
-		resultChan <- URL_response{url, service.CheckURL(url)}
+		logrus.Infoln("Worker ", id, " took ", url, " as work")
+		result := url_response{url, service.CheckURL(url)}
+		resultChan <- result
 	}
 }
 
-func workerPool(workerCount int, tasks []string) map[string]string {
+func WorkerPool(workerCount int, tasks []string) map[string]string {
 	taskChan := make(chan string, len(tasks))
-	resultChan := make(chan URL_response, len(tasks))
+	resultChan := make(chan url_response, len(tasks))
 
 	for i := 0; i < workerCount; i++ {
-		go worker(taskChan, resultChan)
+		go worker(i, taskChan, resultChan)
+		logrus.Infoln("Made ", i, " worker")
 	}
 
 	for i := 0; i < len(tasks); i++ {
 		taskChan <- tasks[i]
+		logrus.Infoln("Put ", i, " task")
 	}
 	close(taskChan)
+	logrus.Infoln("Task chan closed")
+
 	statuses := make(map[string]string)
-	for resp := range resultChan {
+	for i := 0; i < len(tasks); i++ {
+		resp := <-resultChan
 		statuses[resp.URL] = resp.Status
 	}
+	close(resultChan)
+	logrus.Infoln("Result chan closed")
+
 	return statuses
 }

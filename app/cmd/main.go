@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/AntonZatsepilin/mephi-database-homework/app/internal/service"
+	"github.com/AntonZatsepilin/mephi-database-homework/app/internal/workerpool"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var urls = []string{
@@ -36,20 +38,42 @@ var urls = []string{
 	"https://www.weather.com",
 }
 
-func MeasureExecutionTime(name string, f func(), log *logrus.Logger) {
+func MeasureExecutionTime1(name string, f func([]string) map[string]string, log *logrus.Logger) {
 	start := time.Now()
-	f()
+	ressult := f(urls)
+	for url, status := range ressult {
+		fmt.Println(url, " ", status)
+	}
+	duration := time.Since(start)
+	log.Info("Function ", name, " took ", duration, " to execute\n")
+}
+
+func MeasureExecutionTime(name string, f func(int, []string) map[string]string, log *logrus.Logger) {
+	start := time.Now()
+
+	workerCount := viper.GetInt("worker_count")
+	ressult := f(workerCount, urls)
+	for url, status := range ressult {
+		fmt.Println(url, " ", status)
+	}
 	duration := time.Since(start)
 	log.Info("Function ", name, " took ", duration, " to execute\n")
 }
 
 func main() {
 	log := logrus.New()
-
 	log.SetFormatter(&logrus.TextFormatter{})
+	log.SetLevel(logrus.InfoLevel)
 
-	ressult := service.CheckURLs(urls)
-	for _, n := range ressult {
-		fmt.Println(n)
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath("../configs")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Error reading config file: ", err)
 	}
+
+	//workerCount := viper.GetInt("worker_count")
+
+	MeasureExecutionTime1("Without workerpool", service.CheckURLs, log)
+	MeasureExecutionTime("With workerpool", workerpool.WorkerPool, log)
 }
