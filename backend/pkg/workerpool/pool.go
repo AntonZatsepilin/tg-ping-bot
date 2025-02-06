@@ -63,17 +63,21 @@ func (p *Pool) Push(j Job) {
 }
 
 func (p *Pool) Stop() {
-	p.stopped = true
-	close(p.jobs)
-	p.wg.Wait()
+    p.stopped = true
+    close(p.jobs)
+    p.wg.Wait()   
 }
 
-func (p *Pool) initWorker(id int) {
-	for job := range p.jobs {
-		time.Sleep(time.Second)
-		p.results <- p.worker.process(job)
-		p.wg.Done()
-	}
 
-	log.Printf("[worker ID %d] finished proccesing", id)
+func (p *Pool) initWorker(id int) {
+    for job := range p.jobs {
+        time.Sleep(time.Second)
+        result := p.worker.process(job)
+		
+        if !p.stopped {
+            p.results <- result
+        }
+        p.wg.Done()
+    }
+    log.Printf("[worker ID %d] finished processing", id)
 }
