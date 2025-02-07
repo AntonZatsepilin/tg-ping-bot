@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build:
@@ -10,7 +12,10 @@ services:
       REQUEST_TIMEOUT: 2
       WORKERS_COUNT: 3
     ports:
-      - "8080:8080" 
+      - "8080:8080"
+    volumes:
+      - ./app_data:/app/data
+
   mongodb:
     container_name: mongodb
     image: mongo:latest
@@ -19,9 +24,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: sslowmm
     ports:
-    - "127.0.0.1:27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - ./mongo_data:/data/db 
 
   mongo-express:
     container_name: mongo-express
@@ -37,6 +42,3 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: mmm
     ports:
       - "127.0.0.1:8081:8081"
-
-volumes:
-  mongodb_data:
